@@ -37,10 +37,9 @@ namespace GenerateTicket.Consumers
                     var mapModel = _mapper.Map<TicketInfo>(data);
 
 
-                    var res = await _ticketInfoService.AddTicketInfo(mapModel);
+                    var res = await _ticketInfoService.AddTicketInfo(mapModel, context.GetRetryAttempt());
                     if (res is not null)
                     {
-
                         await context.Publish<ISendEmailEvent>(new
                         {
                             TicketId = data.TicketId,

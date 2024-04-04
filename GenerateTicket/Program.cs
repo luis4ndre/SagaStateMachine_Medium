@@ -2,6 +2,7 @@ using GenerateTicket.Consumers;
 using GenerateTicket.Models;
 using GenerateTicket.Services;
 using MassTransit;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -12,7 +13,13 @@ builder.Services.AddControllers();
 builder.Services.AddMassTransit(cfg =>
 {
     cfg.AddBus(provider => MessageBrokers.RabbitMQ.ConfigureBus(provider));
-    cfg.AddConsumer<GenerateTicketConsumer>();
+    cfg.AddConsumer<GenerateTicketConsumer>(c => {
+        c.UseMessageRetry(r =>
+        {
+            r.Ignore<ArgumentNullException>();
+            r.Interval(3, TimeSpan.FromMilliseconds(1000));
+        });
+    });
     cfg.AddConsumer<CancelSendingEmailConsumer>();
 });
 

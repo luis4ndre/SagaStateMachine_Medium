@@ -7,6 +7,7 @@ using TicketService.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
+builder.Services.AddSwaggerGen();
 
 // Connection string
 var connectionString = builder.Configuration.GetConnectionString("DbConnection");
@@ -38,6 +39,11 @@ builder.Services.AddScoped<ITicketServices, TicketServices>();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 var app = builder.Build();
 
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
 
 app.UseHttpsRedirection();
 
